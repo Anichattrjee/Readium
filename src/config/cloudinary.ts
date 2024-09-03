@@ -1,10 +1,10 @@
 import { v2 as cloudinary} from "cloudinary";
-
+import { config } from "./config";
 
 cloudinary.config({
-  cloud_name: 'dlinyid4r',
-  api_key: '279518198325848',
-  api_secret: 'YOUR_API_SECRET',
+  cloud_name: config.cloudinaryCloudName,
+  api_key: config.cloudinaryApiKey,
+  api_secret: config.cloudinaryApiSecret,
   secure: true,
 });
 

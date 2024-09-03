@@ -10,15 +10,15 @@ const app=express();
 app.use(express.json());
 
 
-app.get("/test",(req,res)=>{
-    res.send("Server is ok");
-});
+// app.get("/test",(req,res)=>{
+//     res.send("Server is ok");
+// });
 
-app.get("/",(req,res,next)=>{
-    const error=createHttpError('503',"Something went wrong");
+// app.get("/",(req,res,next)=>{
+//     const error=createHttpError('503',"Something went wrong");
     // next(error);
     // throw error;
-})
+// })
 
 //user router
 app.use('/api/users',userRouter);
