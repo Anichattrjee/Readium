@@ -3,8 +3,9 @@ import path from "node:path";
 import createHttpError from "http-errors";
 import cloudinary from "../config/cloudinary";
 import Book from "./book.model";
-import fs, { fstat } from "node:fs";
+import fs from "node:fs";
 import { AuthRequest } from "../middlewares/authenticate";
+
 
 const createBook = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -172,4 +173,49 @@ const getSingleBook = async (
   }
 };
 
-export { createBook, updateBook, listBooks,getSingleBook };
+const deleteBook = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const bookId = req.params;
+    if (!bookId) {
+      res.status(404).json({ message: "BookId is needed" });
+    }
+
+    const book = await Book.findById({ _id: bookId });
+
+    if (!book) {
+      res.status(404).json({ message: "Book Not Found" });
+    }
+
+    const _req = req as AuthRequest;
+    if (book?.author.toString() != _req.userId) {
+      res
+        .status(403)
+        .json({ message: "You are not allowed to delete other's book" });
+    }
+
+    //https://res.cloudinary.com/dlinyid4r/image/upload/v1725352514/book-covers/igrfoyxddtimiiiqwa7s.png
+    //delete books from cloudinary using publicIds
+    //publicId of coverImage demo:= "book-covers/igrfoyxddtimiiiqwa7s"
+    const coverFileSplits=book?.coverImage.split('/');
+    const coverImagePublicId=coverFileSplits?.at(-2)+'/'+(coverFileSplits?.at(-1))?.split('.')[0];
+
+    //https://res.cloudinary.com/dlinyid4r/raw/upload/v1725352518/book-pdfs/sez2duupfkfwhxwqapmq.pdf
+    //publicId of books demo:= "book-pdfs/sez2duupfkfwhxwqapmq.pdf"
+    const bookFileSplits=book?.file.split("/");
+    const bookFilePublicId=bookFileSplits?.at(-2)+'/'+bookFileSplits?.at(-1);
+
+    try {
+      await cloudinary.uploader.destroy(coverImagePublicId);
+      await cloudinary.uploader.destroy(bookFilePublicId);
+    } catch (error) {
+      return next(createHttpError(404,"Failed to delete books from cloudinary"));
+    }
+
+    const deletedBook = await Book.deleteOne({ _id: bookId });
+    res.status(200).json({ message: "Book Successfully deleted" });
+  } catch (error) {
+    return next(createHttpError(500, "Something went wrong"));
+  }
+};
+
+export { createBook, updateBook, listBooks, getSingleBook, deleteBook };
