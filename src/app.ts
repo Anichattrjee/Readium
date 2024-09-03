@@ -4,9 +4,15 @@ import { config } from "./config/config";
 import globalErrorHandler from "./middlewares/globalErrorHandler";
 import userRouter from "./user/user.route";
 import bookRouter from "./book/book.route";
+import cors from "cors";
+
 
 const app=express();
 
+//cors config
+app.use(cors({
+    origin:config.front_end_domain
+}));
 app.use(express.json());
 
 
