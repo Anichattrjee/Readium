@@ -1,6 +1,6 @@
 import express from "express";
 import path from "node:path";
-import { createBook } from "./book.controller";
+import { createBook, updateBook } from "./book.controller";
 import multer from "multer";
 import authenticate from "../middlewares/authenticate";
 
@@ -18,5 +18,10 @@ bookRouter.post("/",authenticate,upload.fields([
     {name:'coverImage',maxCount:1},
     {name:'file',maxCount:1}
 ]),createBook);
+
+bookRouter.put("/upddate/:bookId",authenticate,upload.fields([
+    {name:'coverImage',maxCount:1},
+    {name:'file',maxCount:1}
+]),updateBook);
 
 export default bookRouter;
