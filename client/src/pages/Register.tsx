@@ -13,6 +13,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { LoaderCircle } from "lucide-react";
+import useTokenStore from "@/store";
 
 const RegisterPage = () => {
   const nameRef = useRef<HTMLInputElement>(null);
@@ -20,12 +21,14 @@ const RegisterPage = () => {
   const passwordRef = useRef<HTMLInputElement>(null);
 
   const navigate = useNavigate();
+  const setToken=useTokenStore((state)=>state.setToken);
 
   //using tanstack query
   const mutation = useMutation({
     mutationFn: register,
-    onSuccess: () => {
+    onSuccess: (response) => {
       console.log("User Successfull Registered");
+      setToken(response.data.accessToken);
       navigate("/dashboard/home");
     },
   });
